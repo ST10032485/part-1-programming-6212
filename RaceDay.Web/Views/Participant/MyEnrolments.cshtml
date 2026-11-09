@@ -1,0 +1,68 @@
+﻿@model List<EnrolmentItem>
+@{
+    ViewData["Title"] = "My Enrolments";
+}
+
+<h2>My Enrolments</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        You have not enrolled in any events yet.
+        <a asp-action="Events">Browse events</a>.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Event</th>
+                    <th>Category</th>
+                    <th>Bib</th>
+                    <th>Enrolled on</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var e in Model)
+                {
+                    var cls = e.Status.ToLower() switch
+                    {
+                        "confirmed" => "badge-confirmed",
+                        "pending" => "badge-pending",
+                        "cancelled" => "badge-cancelled",
+                        _ => "bg-secondary"
+                    };
+                    <tr>
+                        <td>@e.EventTitle</td>
+                        <td>@e.CategoryName</td>
+                        <td>@e.BibNumber</td>
+                        <td>@e.EnrolmentDate.ToString("dd MMM yyyy")</td>
+                        <td><span class="badge @cls">@e.Status</span></td>
+                        <td>
+                            @if (e.Status.ToLower() != "cancelled")
+                            {
+                                <form asp-action="CancelEnrolment" asp-route-id="@e.EnrolmentId" method="post"
+                                      onsubmit="return confirm('Cancel this enrolment?');">
+                                    <button class="btn btn-sm btn-outline-danger">Cancel</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

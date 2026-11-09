@@ -68,4 +68,70 @@ public class ParticipantController : Controller
 
         return RedirectToAction("EventDetails", new { id });
     }
+
+    public async Task<IActionResult> MyEnrolments()
+    {
+        var client = _api.CreateClient();
+        var response = await client.GetAsync("api/enrolments/mine");
+
+        var list = new List<EnrolmentItem>();
+        if (response.IsSuccessStatusCode)
+            list = await response.Content.ReadFromJsonAsync<List<EnrolmentItem>>() ?? new();
+        else
+            TempData["Error"] = "Could not load your enrolments.";
+
+        return View(list);
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> CancelEnrolment(int id)
+    {
+        var client = _api.CreateClient();
+        var response = await client.DeleteAsync($"api/enrolments/{id}");
+
+        if (response.IsSuccessStatusCode)
+            TempData["Success"] = "Enrolment cancelled.";
+        else
+            TempData["Error"] = "Could not cancel the enrolment.";
+
+        return RedirectToAction("MyEnrolments");
+    }
+
+    public async Task<IActionResult> MyResults()
+    {
+        var client = _api.CreateClient();
+        var response = await client.GetAsync("api/results/mine");
+
+        var results = new List<ResultItem>();
+        if (response.IsSuccessStatusCode)
+            results = await response.Content.ReadFromJsonAsync<List<ResultItem>>() ?? new();
+        else
+            TempData["Error"] = "Could not load your results.";
+
+        var rows = new List<MyResultRow>();
+
+        foreach (var r in results)
+        {
+            var row = new MyResultRow { Result = r };
+
+            var eventResponse = await client.GetAsync($"api/events/{r.EventId}");
+            if (eventResponse.IsSuccessStatusCode)
+            {
+                var ev = await eventResponse.Content.ReadFromJsonAsync<EventItem>();
+                row.EventDate = ev?.EventDate;
+            }
+
+            var allResponse = await client.GetAsync($"api/events/{r.EventId}/results");
+            if (allResponse.IsSuccessStatusCode)
+            {
+                var all = await allResponse.Content.ReadFromJsonAsync<List<ResultItem>>() ?? new();
+                row.TotalFinishers = all.Count(x => x.Status == "Finished");
+            }
+
+            rows.Add(row);
+        }
+
+        return View(rows.OrderByDescending(x => x.EventDate).ToList());
+    }
+   
 }
