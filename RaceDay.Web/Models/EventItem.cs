@@ -10,4 +10,6 @@
     public string EventType { get; set; } = "";
     public decimal DistanceKm { get; set; }
     public string Status { get; set; } = "";
+
+    public List<EventCategoryItem> Categories { get; set; } = new();
 }

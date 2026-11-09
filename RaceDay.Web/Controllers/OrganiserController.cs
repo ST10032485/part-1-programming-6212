@@ -126,4 +126,141 @@ public class OrganiserController : Controller
 
         return RedirectToAction("Events");
     }
+
+    public async Task<IActionResult> Categories()
+    {
+        var client = _api.CreateClient();
+        var response = await client.GetAsync("api/events/mine");
+
+        var events = response.IsSuccessStatusCode
+            ? await response.Content.ReadFromJsonAsync<List<EventItem>>() ?? new()
+            : new List<EventItem>();
+
+        return View(events);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> ManageCategories(int id)
+    {
+        var client = _api.CreateClient();
+
+        var eventResponse = await client.GetAsync($"api/events/{id}");
+        if (!eventResponse.IsSuccessStatusCode)
+        {
+            TempData["Error"] = "Event not found.";
+            return RedirectToAction("Categories");
+        }
+
+        var categoriesResponse = await client.GetAsync("api/categories");
+
+        var model = new ManageCategoriesViewModel
+        {
+            Event = (await eventResponse.Content.ReadFromJsonAsync<EventItem>())!,
+            AllCategories = categoriesResponse.IsSuccessStatusCode
+                ? await categoriesResponse.Content.ReadFromJsonAsync<List<CategoryItem>>() ?? new()
+                : new()
+        };
+
+        return View(model);
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddCategoryToEvent(int id, AddCategoryModel form)
+    {
+        if (!ModelState.IsValid)
+        {
+            TempData["Error"] = "Please fill in all fields correctly.";
+            return RedirectToAction("ManageCategories", new { id });
+        }
+
+        var client = _api.CreateClient();
+        var response = await client.PostAsJsonAsync($"api/events/{id}/categories", form);
+
+        if (response.IsSuccessStatusCode)
+            TempData["Success"] = "Category added to the event.";
+        else if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            TempData["Error"] = "That category is already on this event.";
+        else
+            TempData["Error"] = "Could not add the category.";
+
+        return RedirectToAction("ManageCategories", new { id });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> RemoveCategoryFromEvent(int id, int categoryId)
+    {
+        var client = _api.CreateClient();
+        var response = await client.DeleteAsync($"api/events/{id}/categories/{categoryId}");
+
+        if (response.IsSuccessStatusCode)
+            TempData["Success"] = "Category removed.";
+        else if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            TempData["Error"] = "This category has enrolments and cannot be removed.";
+        else
+            TempData["Error"] = "Could not remove the category.";
+
+        return RedirectToAction("ManageCategories", new { id });
+    }
+
+    [HttpGet]
+    public IActionResult CreateCategory() => View(new CategoryFormModel());
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateCategory(CategoryFormModel model)
+    {
+        if (!ModelState.IsValid) return View(model);
+
+        var client = _api.CreateClient();
+        var response = await client.PostAsJsonAsync("api/categories", model);
+
+        if (response.IsSuccessStatusCode)
+        {
+            TempData["Success"] = "Category created. You can now add it to an event.";
+            return RedirectToAction("Categories");
+        }
+
+        ModelState.AddModelError("", "Could not create the category. Please check your details.");
+        return View(model);
+    }
+
+    public async Task<IActionResult> Enrolments()
+    {
+        var client = _api.CreateClient();
+        var response = await client.GetAsync("api/events/mine");
+
+        var events = response.IsSuccessStatusCode
+            ? await response.Content.ReadFromJsonAsync<List<EventItem>>() ?? new()
+            : new List<EventItem>();
+
+        return View(events);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EventEnrolments(int id)
+    {
+        var client = _api.CreateClient();
+
+        var eventResponse = await client.GetAsync($"api/events/{id}");
+        if (!eventResponse.IsSuccessStatusCode)
+        {
+            TempData["Error"] = "Event not found.";
+            return RedirectToAction("Enrolments");
+        }
+
+        var ev = await eventResponse.Content.ReadFromJsonAsync<EventItem>();
+        ViewBag.EventTitle = ev!.Title;
+        ViewBag.EventId = id;
+
+        var response = await client.GetAsync($"api/events/{id}/enrolments");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            ViewBag.LoadError = "Could not load enrolments for this event.";
+            return View(new List<EnrolmentItem>());
+        }
+
+        var list = await response.Content.ReadFromJsonAsync<List<EnrolmentItem>>() ?? new();
+        return View(list);
+    }
 }
+

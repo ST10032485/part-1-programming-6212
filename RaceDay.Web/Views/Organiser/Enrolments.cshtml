@@ -1,0 +1,31 @@
+﻿@model List<EventItem>
+@{
+    ViewData["Title"] = "Enrolments";
+}
+
+<h2>Enrolments</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<p class="text-muted">Pick an event to see who has enrolled.</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">You have no events yet.</div>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var e in Model)
+        {
+            <a asp-action="EventEnrolments" asp-route-id="@e.EventId"
+               class="list-group-item list-group-item-action d-flex justify-content-between">
+                <span>@e.Title <small class="text-muted">(@e.EventDate.ToString("dd MMM yyyy"))</small></span>
+                <span>View &rarr;</span>
+            </a>
+        }
+    </div>
+}
