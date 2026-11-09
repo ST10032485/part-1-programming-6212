@@ -1,0 +1,76 @@
+﻿@model EventResultsViewModel
+@{
+    ViewData["Title"] = "Event Results";
+}
+
+<h2>@Model.EventTitle</h2>
+<p class="text-muted">Enter a finish time (hh:mm:ss), position and status for each participant.</p>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (!Model.Rows.Any())
+{
+    <div class="alert alert-info">Nobody has enrolled for this event yet.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Bib</th>
+                    <th>Participant</th>
+                    <th>Category</th>
+                    <th>Finish time</th>
+                    <th>Position</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model.Rows)
+                {
+                    var id = row.Enrolment.EnrolmentId;
+                    var status = row.Result?.Status ?? "Finished";
+                    <tr>
+                        <td>@row.Enrolment.BibNumber</td>
+                        <td>@row.Enrolment.ParticipantName</td>
+                        <td>@row.Enrolment.CategoryName</td>
+                        <td>
+                            <input form="f-@id" name="finishTime" class="form-control form-control-sm"
+                                   placeholder="00:48:32" value="@row.Result?.FinishTime" />
+                        </td>
+                        <td>
+                            <input form="f-@id" name="position" type="number" min="1"
+                                   class="form-control form-control-sm" value="@row.Result?.Position" />
+                        </td>
+                        <td>
+                            <select form="f-@id" name="status" class="form-select form-select-sm">
+                                <option value="Finished" selected="@(status == "Finished")">Finished</option>
+                                <option value="DNF" selected="@(status == "DNF")">DNF</option>
+                                <option value="DNS" selected="@(status == "DNS")">DNS</option>
+                            </select>
+                        </td>
+                        <td>
+                            <form id="f-@id" asp-action="SaveResult" method="post">
+                                <input type="hidden" name="eventId" value="@Model.EventId" />
+                                <input type="hidden" name="enrolmentId" value="@id" />
+                                <input type="hidden" name="resultId" value="@row.Result?.ResultId" />
+                                <button class="btn btn-sm btn-raceday">Save</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<a asp-action="Results" class="btn btn-link">Back to events</a>

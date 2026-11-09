@@ -262,5 +262,105 @@ public class OrganiserController : Controller
         var list = await response.Content.ReadFromJsonAsync<List<EnrolmentItem>>() ?? new();
         return View(list);
     }
+
+    public async Task<IActionResult> Results()
+    {
+        var client = _api.CreateClient();
+        var response = await client.GetAsync("api/events/mine");
+
+        var events = response.IsSuccessStatusCode
+            ? await response.Content.ReadFromJsonAsync<List<EventItem>>() ?? new()
+            : new List<EventItem>();
+
+        return View(events);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EventResults(int id)
+    {
+        var client = _api.CreateClient();
+
+        var eventResponse = await client.GetAsync($"api/events/{id}");
+        if (!eventResponse.IsSuccessStatusCode)
+        {
+            TempData["Error"] = "Event not found.";
+            return RedirectToAction("Results");
+        }
+
+        var ev = await eventResponse.Content.ReadFromJsonAsync<EventItem>();
+
+        var enrolResponse = await client.GetAsync($"api/events/{id}/enrolments");
+        var resultResponse = await client.GetAsync($"api/events/{id}/results");
+
+        var enrolments = enrolResponse.IsSuccessStatusCode
+            ? await enrolResponse.Content.ReadFromJsonAsync<List<EnrolmentItem>>() ?? new()
+            : new List<EnrolmentItem>();
+
+        var results = resultResponse.IsSuccessStatusCode
+            ? await resultResponse.Content.ReadFromJsonAsync<List<ResultItem>>() ?? new()
+            : new List<ResultItem>();
+
+        var model = new EventResultsViewModel
+        {
+            EventId = id,
+            EventTitle = ev!.Title,
+            Rows = enrolments
+                .Where(e => e.Status.ToLower() != "cancelled")
+                .Select(e => new ResultRow
+                {
+                    Enrolment = e,
+                    Result = results.FirstOrDefault(r => r.EnrolmentId == e.EnrolmentId)
+                })
+                .OrderBy(r => r.Enrolment.BibNumber)
+                .ToList()
+        };
+
+        return View(model);
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> SaveResult(int eventId, int enrolmentId, int? resultId,
+        string? finishTime, int? position, string status)
+    {
+        TimeSpan? time = null;
+        if (!string.IsNullOrWhiteSpace(finishTime))
+        {
+            if (!TimeSpan.TryParse(finishTime, out var parsed))
+            {
+                TempData["Error"] = "Finish time must look like 00:48:32 (hh:mm:ss).";
+                return RedirectToAction("EventResults", new { id = eventId });
+            }
+            time = parsed;
+        }
+
+        if (status == "Finished" && (time == null || position == null))
+        {
+            TempData["Error"] = "A finished runner needs a finish time and a position.";
+            return RedirectToAction("EventResults", new { id = eventId });
+        }
+
+        var client = _api.CreateClient();
+        HttpResponseMessage response;
+
+        if (resultId.HasValue)
+        {
+            var update = new { FinishTime = time, Position = position, Status = status };
+            response = await client.PutAsJsonAsync($"api/results/{resultId}", update);
+        }
+        else
+        {
+            var create = new { EnrolmentId = enrolmentId, FinishTime = time, Position = position, Status = status };
+            response = await client.PostAsJsonAsync("api/results", create);
+        }
+
+        if (response.IsSuccessStatusCode)
+            TempData["Success"] = "Result saved.";
+        else if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            TempData["Error"] = "That position is already taken or a result already exists.";
+        else
+            TempData["Error"] = "Could not save the result. Please check the details.";
+
+        return RedirectToAction("EventResults", new { id = eventId });
+    }
 }
 
