@@ -10,6 +10,9 @@ builder.Services.AddHttpClient("RaceDayApi", client =>
     client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!);
 });
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ApiService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

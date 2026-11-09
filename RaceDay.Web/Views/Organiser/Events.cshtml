@@ -1,0 +1,60 @@
+﻿@model List<EventItem>
+@{
+    ViewData["Title"] = "My Events";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>My Events</h2>
+    <a asp-action="CreateEvent" class="btn btn-raceday">+ New Event</a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">You have not created any events yet.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Title</th>
+                    <th>Date</th>
+                    <th>City</th>
+                    <th>Type</th>
+                    <th>Distance</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var e in Model)
+                {
+                    <tr>
+                        <td>@e.Title</td>
+                        <td>@e.EventDate.ToString("dd MMM yyyy")</td>
+                        <td>@e.City</td>
+                        <td>@e.EventType</td>
+                        <td>@e.DistanceKm km</td>
+                        <td>@e.Status</td>
+                        <td>
+                            <form asp-action="DeleteEvent" asp-route-id="@e.EventId" method="post"
+                                  onsubmit="return confirm('Delete this event?');">
+                                <button class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
