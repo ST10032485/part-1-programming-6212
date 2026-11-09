@@ -59,6 +59,12 @@ public class AccountController : Controller
         HttpContext.Session.SetString("Email", result.Email);
         HttpContext.Session.SetInt32("UserId", result.UserId);
 
+        var roleName = result.Role ?? result.RoleName;
+        if (roleName == "Organiser")
+            return RedirectToAction("Dashboard", "Organiser");
+        if (roleName == "Participant")
+            return RedirectToAction("Events", "Participant");
+
         return RedirectToAction("Index", "Home");
     }
 

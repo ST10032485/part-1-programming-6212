@@ -362,5 +362,43 @@ public class OrganiserController : Controller
 
         return RedirectToAction("EventResults", new { id = eventId });
     }
+    public async Task<IActionResult> Dashboard()
+    {
+        var client = _api.CreateClient();
+        var response = await client.GetAsync("api/events/mine");
+
+        var events = new List<EventItem>();
+        if (response.IsSuccessStatusCode)
+            events = await response.Content.ReadFromJsonAsync<List<EventItem>>() ?? new();
+        else
+            TempData["Error"] = "Could not load your dashboard.";
+
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        var model = new DashboardViewModel();
+
+        foreach (var e in events.OrderBy(x => x.EventDate))
+        {
+            int count = 0;
+            var enrolResponse = await client.GetAsync($"api/events/{e.EventId}/enrolments");
+
+            if (enrolResponse.IsSuccessStatusCode)
+            {
+                var list = await enrolResponse.Content.ReadFromJsonAsync<List<EnrolmentItem>>() ?? new();
+                count = list.Count(x => x.Status.ToLower() != "cancelled");
+            }
+
+            model.Rows.Add(new DashboardEventRow { Event = e, EnrolmentCount = count });
+        }
+
+        model.TotalEvents = events.Count;
+        model.TotalEnrolments = model.Rows.Sum(r => r.EnrolmentCount);
+        model.UpcomingEvents = events.Count(e => e.Status == "Upcoming" && e.EventDate >= today);
+        model.NextEvent = events
+            .Where(e => e.Status == "Upcoming" && e.EventDate >= today)
+            .OrderBy(e => e.EventDate)
+            .FirstOrDefault();
+
+        return View(model);
+    }
 }
 

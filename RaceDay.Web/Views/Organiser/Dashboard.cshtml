@@ -1,0 +1,91 @@
+﻿@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h2>Organiser Dashboard</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <div class="display-6 fw-bold">@Model.TotalEvents</div>
+                <div class="text-muted">Total events</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <div class="display-6 fw-bold">@Model.UpcomingEvents</div>
+                <div class="text-muted">Upcoming events</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <div class="display-6 fw-bold">@Model.TotalEnrolments</div>
+                <div class="text-muted">Total enrolments</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <div class="fw-bold">
+                    @(Model.NextEvent != null ? Model.NextEvent.EventDate.ToString("dd MMM yyyy") : "None")
+                </div>
+                <div class="text-muted">Next event</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4>Your events</h4>
+
+@if (!Model.Rows.Any())
+{
+    <div class="alert alert-info">
+        You have not created any events yet.
+        <a asp-action="CreateEvent">Create your first event</a>.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Event</th>
+                    <th>Date</th>
+                    <th>City</th>
+                    <th>Status</th>
+                    <th>Enrolments</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.Rows)
+                {
+                    <tr>
+                        <td>@r.Event.Title</td>
+                        <td>@r.Event.EventDate.ToString("dd MMM yyyy")</td>
+                        <td>@r.Event.City</td>
+                        <td>@r.Event.Status</td>
+                        <td><span class="badge bg-dark">@r.EnrolmentCount</span></td>
+                        <td>
+                            <a asp-action="EventEnrolments" asp-route-id="@r.Event.EventId"
+                               class="btn btn-sm btn-outline-dark">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
