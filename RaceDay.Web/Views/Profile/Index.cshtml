@@ -1,0 +1,54 @@
+﻿@model ProfileModel
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="col-md-6 mx-auto">
+    <h2>My Profile</h2>
+    <p class="text-muted">Signed in as @Model.Role</p>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <form asp-action="Index" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="UserId" />
+        <input type="hidden" asp-for="Role" />
+
+        <div class="mb-3">
+            <label asp-for="FirstName" class="form-label"></label>
+            <input asp-for="FirstName" class="form-control" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="LastName" class="form-label"></label>
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" readonly />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Phone" class="form-label"></label>
+            <input asp-for="Phone" class="form-control" />
+            <span asp-validation-for="Phone" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="DateOfBirth" class="form-label"></label>
+            <input asp-for="DateOfBirth" type="date" class="form-control" />
+        </div>
+
+        <button class="btn btn-raceday">Save Changes</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
