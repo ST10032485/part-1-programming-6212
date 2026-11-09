@@ -51,6 +51,66 @@ public class OrganiserController : Controller
         return View(model);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> EditEvent(int id)
+    {
+        var client = _api.CreateClient();
+        var response = await client.GetAsync($"api/events/{id}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            TempData["Error"] = "Event not found.";
+            return RedirectToAction("Events");
+        }
+
+        var e = await response.Content.ReadFromJsonAsync<EventItem>();
+
+        var model = new EventFormModel
+        {
+            Title = e!.Title,
+            Description = e.Description,
+            Venue = e.Venue,
+            City = e.City,
+            EventDate = e.EventDate,
+            RegistrationDeadline = e.RegistrationDeadline,
+            EventType = e.EventType,
+            DistanceKm = e.DistanceKm
+        };
+
+        ViewBag.EventId = id;
+        return View(model);
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditEvent(int id, EventFormModel model)
+    {
+        ViewBag.EventId = id;
+        if (!ModelState.IsValid) return View(model);
+
+        if (model.RegistrationDeadline > model.EventDate)
+        {
+            ModelState.AddModelError("", "Registration deadline must be on or before the event date.");
+            return View(model);
+        }
+
+        var client = _api.CreateClient();
+        var response = await client.PutAsJsonAsync($"api/events/{id}", model);
+
+        if (response.IsSuccessStatusCode)
+        {
+            TempData["Success"] = "Event updated.";
+            return RedirectToAction("Events");
+        }
+
+        if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            ModelState.AddModelError("", "You can only edit your own events.");
+        else
+            ModelState.AddModelError("", "Could not update the event. Please check your details.");
+
+        return View(model);
+    }
+
+
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteEvent(int id)
     {
