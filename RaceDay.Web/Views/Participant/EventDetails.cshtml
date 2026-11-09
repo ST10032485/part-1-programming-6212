@@ -1,0 +1,54 @@
+﻿@model EventItem
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<span class="badge bg-dark mb-2">@Model.EventType</span>
+<h2>@Model.Title</h2>
+<p class="text-muted">
+    @Model.EventDate.ToString("dd MMM yyyy") | @Model.Venue, @Model.City | @Model.DistanceKm km
+</p>
+<p>@Model.Description</p>
+<p><strong>Register by:</strong> @Model.RegistrationDeadline.ToString("dd MMM yyyy")</p>
+
+<h4 class="mt-4">Categories</h4>
+@if (!Model.Categories.Any())
+{
+    <div class="alert alert-info">No categories have been added to this event yet.</div>
+}
+else
+{
+    <table class="table align-middle">
+        <thead class="table-dark">
+            <tr><th>Category</th><th>Entry fee</th><th>Places</th><th></th></tr>
+        </thead>
+        <tbody>
+            @foreach (var c in Model.Categories)
+            {
+                <tr>
+                    <td>@c.CategoryName</td>
+                    <td>@("R" + c.EntryFee.ToString("0.00"))</td>
+                    <td>@c.MaxParticipants</td>
+                    <td>
+                        <form asp-action="Enrol" asp-route-id="@Model.EventId" method="post"
+                              onsubmit="return confirm('Enrol in this category?');">
+                            <input type="hidden" name="categoryId" value="@c.CategoryId" />
+                            <button class="btn btn-sm btn-raceday">Enrol</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a asp-action="Events" class="btn btn-link">Back to events</a>
