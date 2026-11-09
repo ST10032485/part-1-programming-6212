@@ -1,9 +1,19 @@
 ﻿@model DashboardViewModel
 @{
     ViewData["Title"] = "Dashboard";
+    var email = Context.Session.GetString("Email");
 }
 
-<h2>Organiser Dashboard</h2>
+<div class="page-header">
+    <div>
+        <h2>Organiser Dashboard</h2>
+        <div class="sub">Signed in as @email</div>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="CreateEvent" class="btn btn-raceday">+ New Event</a>
+        <a asp-action="Results" class="btn btn-outline-dark">Enter Results</a>
+    </div>
+</div>
 
 @if (TempData["Error"] != null)
 {
@@ -11,81 +21,83 @@
 }
 
 <div class="row g-3 mb-4">
-    <div class="col-md-3">
-        <div class="card text-center shadow-sm">
-            <div class="card-body">
-                <div class="display-6 fw-bold">@Model.TotalEvents</div>
-                <div class="text-muted">Total events</div>
-            </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="value">@Model.TotalEvents</div>
+            <div class="label">Total events</div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card text-center shadow-sm">
-            <div class="card-body">
-                <div class="display-6 fw-bold">@Model.UpcomingEvents</div>
-                <div class="text-muted">Upcoming events</div>
-            </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="value">@Model.UpcomingEvents</div>
+            <div class="label">Upcoming events</div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card text-center shadow-sm">
-            <div class="card-body">
-                <div class="display-6 fw-bold">@Model.TotalEnrolments</div>
-                <div class="text-muted">Total enrolments</div>
-            </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="value">@Model.TotalEnrolments</div>
+            <div class="label">Total enrolments</div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card text-center shadow-sm">
-            <div class="card-body">
-                <div class="fw-bold">
-                    @(Model.NextEvent != null ? Model.NextEvent.EventDate.ToString("dd MMM yyyy") : "None")
-                </div>
-                <div class="text-muted">Next event</div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="value" style="font-size:1.4rem;">
+                @(Model.NextEvent != null ? Model.NextEvent.EventDate.ToString("dd MMM yyyy") : "None")
             </div>
+            <div class="label">Next event</div>
         </div>
     </div>
 </div>
 
-<h4>Your events</h4>
+<div class="panel">
+    <div class="panel-head">Your events</div>
 
-@if (!Model.Rows.Any())
-{
-    <div class="alert alert-info">
-        You have not created any events yet.
-        <a asp-action="CreateEvent">Create your first event</a>.
-    </div>
-}
-else
-{
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th>Event</th>
-                    <th>Date</th>
-                    <th>City</th>
-                    <th>Status</th>
-                    <th>Enrolments</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var r in Model.Rows)
-                {
+    @if (!Model.Rows.Any())
+    {
+        <div class="p-4">
+            <div class="alert alert-info mb-0">
+                You have not created any events yet.
+                <a asp-action="CreateEvent">Create your first event</a>.
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
                     <tr>
-                        <td>@r.Event.Title</td>
-                        <td>@r.Event.EventDate.ToString("dd MMM yyyy")</td>
-                        <td>@r.Event.City</td>
-                        <td>@r.Event.Status</td>
-                        <td><span class="badge bg-dark">@r.EnrolmentCount</span></td>
-                        <td>
-                            <a asp-action="EventEnrolments" asp-route-id="@r.Event.EventId"
-                               class="btn btn-sm btn-outline-dark">View</a>
-                        </td>
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th>City</th>
+                        <th>Status</th>
+                        <th>Enrolments</th>
+                        <th></th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-}
+                </thead>
+                <tbody>
+                    @foreach (var r in Model.Rows)
+                    {
+                        var pill = r.Event.Status.ToLower() switch
+                        {
+                            "upcoming" => "pill-upcoming",
+                            "completed" => "pill-completed",
+                            _ => "pill-cancelled"
+                        };
+                        <tr>
+                            <td class="fw-semibold">@r.Event.Title</td>
+                            <td>@r.Event.EventDate.ToString("dd MMM yyyy")</td>
+                            <td>@r.Event.City</td>
+                            <td><span class="pill @pill">@r.Event.Status</span></td>
+                            <td>@r.EnrolmentCount</td>
+                            <td class="text-end">
+                                <a asp-action="EventEnrolments" asp-route-id="@r.Event.EventId"
+                                   class="btn btn-sm btn-outline-dark">View</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

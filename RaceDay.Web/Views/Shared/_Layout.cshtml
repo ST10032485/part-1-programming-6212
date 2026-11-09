@@ -3,6 +3,10 @@
     var role = Context.Session.GetString("Role");
     var email = Context.Session.GetString("Email");
     var loggedIn = !string.IsNullOrEmpty(Context.Session.GetString("Token"));
+    var ctrl = ViewContext.RouteData.Values["controller"]?.ToString();
+    var act = ViewContext.RouteData.Values["action"]?.ToString();
+    string Active(string c, string a) => (ctrl == c && act == a) ? "active" : "";
+    var full = ViewData["FullWidth"] as bool? == true;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -16,63 +20,59 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark raceday-nav">
-            <div class="container">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">RACE<span>DAY</span></a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="nav">
-                    <ul class="navbar-nav me-auto">
-                        
-                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Home</a></
+    <header class="rd-nav">
+        <div class="rd-nav-inner">
+            <a class="rd-brand" asp-controller="Home" asp-action="Index">RACE<span>DAY</span></a>
 
-                        @if (role == "Organiser")
-                        {
-                            <li class="nav-item"><a class="nav-link" asp-controller="Profile" asp-action="Index">Profile</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-controller="Organiser" asp-action="Dashboard">Dashboard</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-controller="Organiser" asp-action="Events">My Events</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-controller="Organiser" asp-action="Categories">Categories</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-controller="Organiser" asp-action="Enrolments">Enrolments</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-controller="Organiser" asp-action="Results">Results</a></li>
-                            
-                        }
-                        else if (role == "Participant")
-                        {
-                            <li class="nav-item"><a class="nav-link" asp-controller="Profile" asp-action="Index">Profile</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-controller="Participant" asp-action="Events">Events</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-controller="Participant" asp-action="MyEnrolments">My Enrolments</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-controller="Participant" asp-action="MyResults">My Results</a></li>
-                            
-                            
-                        }
-                    </ul>
-                    <ul class="navbar-nav">
-                        @if (loggedIn)
-                        {
-                            <li class="nav-item"><span class="navbar-text me-3">@email (@role)</span></li>
-                            <li class="nav-item"><a class="btn btn-outline-light btn-sm" asp-controller="Account" asp-action="Logout">Logout</a></li>
-                        }
-                        else
-                        {
-                            <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Login">Login</a></li>
-                            <li class="nav-item"><a class="btn btn-raceday btn-sm" asp-controller="Account" asp-action="Register">Register</a></li>
-                        }
-                    </ul>
-                </div>
+            <nav class="rd-links">
+                @if (role == "Organiser")
+                {
+                    <a class="@Active("Organiser", "Dashboard")" asp-controller="Organiser" asp-action="Dashboard">Dashboard</a>
+                    <a class="@Active("Organiser", "Events")" asp-controller="Organiser" asp-action="Events">My Events</a>
+                    <a class="@Active("Organiser", "Categories")" asp-controller="Organiser" asp-action="Categories">Categories</a>
+                    <a class="@Active("Organiser", "Enrolments")" asp-controller="Organiser" asp-action="Enrolments">Enrolments</a>
+                    <a class="@Active("Organiser", "Results")" asp-controller="Organiser" asp-action="Results">Results</a>
+                    <a class="@Active("Profile", "Index")" asp-controller="Profile" asp-action="Index">Profile</a>
+                }
+                else if (role == "Participant")
+                {
+                    <a class="@Active("Participant", "Events")" asp-controller="Participant" asp-action="Events">Events</a>
+                    <a class="@Active("Participant", "MyEnrolments")" asp-controller="Participant" asp-action="MyEnrolments">My Enrolments</a>
+                    <a class="@Active("Participant", "MyResults")" asp-controller="Participant" asp-action="MyResults">My Results</a>
+                    <a class="@Active("Profile", "Index")" asp-controller="Profile" asp-action="Index">Profile</a>
+                }
+            </nav>
+
+            <div class="rd-user">
+                @if (loggedIn)
+                {
+                    <span class="who">@email (@role)</span>
+                    <a class="btn btn-outline-light btn-sm" asp-controller="Account" asp-action="Logout">Logout</a>
+                }
+                else
+                {
+                    <a class="rd-link-plain" asp-controller="Account" asp-action="Login">Login</a>
+                    <a class="btn btn-raceday btn-sm" asp-controller="Account" asp-action="Register">Register</a>
+                }
             </div>
-        </nav>
+        </div>
     </header>
 
-    <div class="container py-4">
-        <main role="main">
+    <main class="rd-main">
+        @if (full)
+        {
             @RenderBody()
-        </main>
-    </div>
+        }
+        else
+        {
+            <div class="container-xl py-4">
+                @RenderBody()
+            </div>
+        }
+    </main>
 
-    <footer class="raceday-footer">
-        <div class="container">&copy; 2026 RaceDay. Run. Walk. Cycle.</div>
+    <footer class="rd-footer">
+        &copy; 2026 RaceDay. Run. Walk. Cycle.
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

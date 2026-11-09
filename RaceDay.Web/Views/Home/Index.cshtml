@@ -1,15 +1,62 @@
 ﻿@{
     ViewData["Title"] = "Home";
+    ViewData["FullWidth"] = true;
+    var role = Context.Session.GetString("Role");
     var loggedIn = !string.IsNullOrEmpty(Context.Session.GetString("Token"));
 }
 
-<div class="hero">
+<section class="hero">
     <h1>Welcome to RACE<span>DAY</span></h1>
-    <p class="lead">Find your next run, walk or cycle event and enrol in minutes.</p>
+    <p>Find your next run, walk or cycle event, enrol in minutes and track your results, all in one place.</p>
 
     @if (!loggedIn)
     {
-        <a class="btn btn-raceday btn-lg me-2" asp-controller="Account" asp-action="Register">Get Started</a>
+        <a class="btn btn-raceday btn-lg me-2" asp-controller="Account" asp-action="Register">Get started</a>
         <a class="btn btn-outline-light btn-lg" asp-controller="Account" asp-action="Login">Login</a>
     }
-</div>
+    else if (role == "Organiser")
+    {
+        <a class="btn btn-raceday btn-lg me-2" asp-controller="Organiser" asp-action="Dashboard">Open dashboard</a>
+        <a class="btn btn-outline-light btn-lg" asp-controller="Organiser" asp-action="CreateEvent">Create an event</a>
+    }
+    else
+    {
+        <a class="btn btn-raceday btn-lg me-2" asp-controller="Participant" asp-action="Events">Browse events</a>
+        <a class="btn btn-outline-light btn-lg" asp-controller="Participant" asp-action="MyResults">My results</a>
+    }
+</section>
+
+<section class="container-xl py-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="feature">
+                <div class="num">1</div>
+                <h5>Find an event</h5>
+                <p>Filter upcoming runs, walks and cycles by city, type and date.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature">
+                <div class="num">2</div>
+                <h5>Enrol in minutes</h5>
+                <p>Choose your category, get your bib number and see your status instantly.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature">
+                <div class="num">3</div>
+                <h5>Track your results</h5>
+                <p>See your finish time and position as soon as the organiser publishes them.</p>
+            </div>
+        </div>
+    </div>
+
+    @if (!loggedIn)
+    {
+        <div class="cta-band mt-5">
+            <h3>Ready for race day?</h3>
+            <p>Create a free account and enter your first event today.</p>
+            <a class="btn btn-raceday btn-lg" asp-controller="Account" asp-action="Register">Create account</a>
+        </div>
+    }
+</section>

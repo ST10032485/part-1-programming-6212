@@ -1,59 +1,366 @@
 :root {
     --rd-orange: #ff5a1f;
+    --rd-btn: #d9480f;
+    --rd-btn-hover: #b93a09;
     --rd-dark: #111827;
     --rd-light: #f8f9fa;
+    --rd-muted: #6b7280;
+    --rd-border: #e5e7eb;
+}
+
+html, body {
+    height: 100%;
 }
 
 body {
     font-family: 'Poppins', sans-serif;
     background: var(--rd-light);
     color: var(--rd-dark);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-.raceday-nav {
+.rd-main {
+    flex: 1;
+}
+
+/* ---------- Navbar ---------- */
+.rd-nav {
     background: var(--rd-dark);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
-    .raceday-nav .navbar-brand {
-        font-weight: 700;
-        letter-spacing: 2px;
+.rd-nav-inner {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+}
+
+.rd-brand {
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: 2px;
+    font-size: 1.25rem;
+    text-decoration: none;
+}
+
+    .rd-brand span {
+        color: var(--rd-orange);
+    }
+
+    .rd-brand:hover {
         color: #fff;
     }
 
-        .raceday-nav .navbar-brand span {
-            color: var(--rd-orange);
+.rd-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    flex: 1;
+}
+
+    .rd-links a {
+        color: #cbd5e1;
+        text-decoration: none;
+        font-size: 0.9rem;
+        padding: 0.4rem 0.75rem;
+        border-radius: 6px;
+    }
+
+        .rd-links a:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
         }
 
-.btn-raceday,
-.btn-primary {
-    background: var(--rd-orange);
-    border-color: var(--rd-orange);
+        .rd-links a.active {
+            color: #fff;
+            background: rgba(255, 90, 31, 0.25);
+        }
+
+.rd-user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+    .rd-user .who {
+        color: #94a3b8;
+        font-size: 0.85rem;
+    }
+
+.rd-link-plain {
+    color: #e5e7eb;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+    .rd-link-plain:hover {
+        color: #fff;
+    }
+
+/* ---------- Footer ---------- */
+.rd-footer {
+    background: var(--rd-dark);
+    color: #9ca3af;
+    text-align: center;
+    padding: 1.25rem 0;
+    font-size: 0.9rem;
+}
+
+/* ---------- Buttons and forms ---------- */
+.btn-raceday, .btn-primary {
+    background: var(--rd-btn);
+    border-color: var(--rd-btn);
     color: #fff;
     font-weight: 600;
 }
 
-    .btn-raceday:hover,
-    .btn-primary:hover {
-        background: #e14a12;
-        border-color: #e14a12;
+    .btn-raceday:hover, .btn-primary:hover {
+        background: var(--rd-btn-hover);
+        border-color: var(--rd-btn-hover);
         color: #fff;
     }
 
+.form-control:focus, .form-select:focus {
+    border-color: var(--rd-orange);
+    box-shadow: 0 0 0 0.2rem rgba(255, 90, 31, 0.2);
+}
+
+/* ---------- Auth pages ---------- */
+.auth-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 230px);
+    padding: 2rem 0;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 440px;
+    background: #fff;
+    border: 1px solid var(--rd-border);
+    border-top: 5px solid var(--rd-orange);
+    border-radius: 14px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+    .auth-card.wide {
+        max-width: 620px;
+    }
+
+    .auth-card h2 {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+
+    .auth-card .sub {
+        color: var(--rd-muted);
+        margin-bottom: 1.5rem;
+    }
+
+    .auth-card .form-control, .auth-card .form-select {
+        padding: 0.65rem 0.85rem;
+        border-radius: 8px;
+    }
+
+    .auth-card .form-label {
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .auth-card .switch {
+        text-align: center;
+        margin-top: 1.25rem;
+        color: var(--rd-muted);
+        font-size: 0.95rem;
+    }
+
+        .auth-card .switch a {
+            color: var(--rd-btn);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+/* ---------- Home ---------- */
 .hero {
-    background: linear-gradient(135deg, var(--rd-dark), #374151);
+    background: linear-gradient(135deg, #111827 0%, #1f2937 60%, #7c2d12 150%);
     color: #fff;
-    border-radius: 12px;
-    padding: 4rem 2rem;
+    padding: 6rem 1.5rem;
     text-align: center;
 }
 
     .hero h1 {
         font-weight: 700;
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        margin: 0;
     }
 
         .hero h1 span {
             color: var(--rd-orange);
         }
+
+    .hero p {
+        color: #d1d5db;
+        font-size: 1.15rem;
+        max-width: 640px;
+        margin: 1rem auto 2rem;
+    }
+
+    .hero .btn {
+        padding: 0.75rem 1.75rem;
+        border-radius: 10px;
+    }
+
+.feature {
+    background: #fff;
+    border: 1px solid var(--rd-border);
+    border-radius: 12px;
+    padding: 1.75rem;
+    height: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+    .feature .num {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: var(--rd-btn);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .feature h5 {
+        font-weight: 600;
+    }
+
+    .feature p {
+        color: var(--rd-muted);
+        margin: 0;
+    }
+
+.cta-band {
+    background: var(--rd-dark);
+    color: #fff;
+    border-radius: 16px;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+}
+
+    .cta-band h3 {
+        font-weight: 700;
+    }
+
+    .cta-band p {
+        color: #9ca3af;
+    }
+
+/* ---------- Page header, panels, stats ---------- */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+    .page-header h2 {
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .page-header .sub {
+        color: var(--rd-muted);
+        font-size: 0.95rem;
+    }
+
+.stat-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--rd-border);
+    border-left: 5px solid var(--rd-orange);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    height: 100%;
+}
+
+    .stat-card .value {
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: 1.1;
+    }
+
+    .stat-card .label {
+        color: var(--rd-muted);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+.panel {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid var(--rd-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+.panel-head {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--rd-border);
+    font-weight: 600;
+}
+
+.panel .table {
+    margin: 0;
+}
+
+    .panel .table thead th {
+        background: #f9fafb;
+        color: var(--rd-muted);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 1px solid var(--rd-border);
+    }
+
+/* ---------- Status ---------- */
+.pill {
+    display: inline-block;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.pill-upcoming {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.pill-completed {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.pill-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
 
 .badge-confirmed {
     background: #198754;
@@ -68,10 +375,74 @@ body {
     background: #dc3545;
 }
 
-.raceday-footer {
-    background: var(--rd-dark);
-    color: #ccc;
-    text-align: center;
-    padding: 1rem 0;
-    margin-top: 3rem;
+/* ---------- Event cards and filters ---------- */
+.event-card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid var(--rd-border);
+    border-top: 5px solid var(--rd-orange);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+    .event-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .event-card.type-walk {
+        border-top-color: #16a34a;
+    }
+
+    .event-card.type-cycle {
+        border-top-color: #2563eb;
+    }
+
+    .event-card .body {
+        padding: 1.25rem;
+        flex: 1;
+    }
+
+    .event-card .foot {
+        padding: 0 1.25rem 1.25rem;
+    }
+
+    .event-card .type-tag {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--rd-muted);
+    }
+
+    .event-card h5 {
+        font-weight: 600;
+        margin: 0.4rem 0;
+    }
+
+    .event-card .meta {
+        color: var(--rd-muted);
+        font-size: 0.9rem;
+    }
+
+.chip {
+    display: inline-block;
+    background: #f3f4f6;
+    border-radius: 999px;
+    padding: 0.2rem 0.7rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+.filter-bar {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid var(--rd-border);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }

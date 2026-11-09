@@ -1,32 +1,44 @@
 ﻿@model List<EventItem>
 @{
     ViewData["Title"] = "Events";
+    var email = Context.Session.GetString("Email");
 }
 
-<h2>Upcoming Events</h2>
+<div class="page-header">
+    <div>
+        <h2>Upcoming Events</h2>
+        <div class="sub">Welcome, @email. Find your next run, walk or cycle.</div>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="MyEnrolments" class="btn btn-outline-dark">My Enrolments</a>
+        <a asp-action="MyResults" class="btn btn-outline-dark">My Results</a>
+    </div>
+</div>
 
 @if (TempData["Error"] != null)
 {
     <div class="alert alert-danger">@TempData["Error"]</div>
 }
 
-<form method="get" class="row g-2 mb-4">
-    <div class="col-md-4">
-        <input name="city" class="form-control" placeholder="City" value="@ViewBag.City" />
-    </div>
-    <div class="col-md-3">
-        <select name="type" class="form-select">
-            <option value="">All types</option>
-            <option value="Run" selected="@(ViewBag.Type == "Run")">Run</option>
-            <option value="Walk" selected="@(ViewBag.Type == "Walk")">Walk</option>
-            <option value="Cycle" selected="@(ViewBag.Type == "Cycle")">Cycle</option>
-        </select>
-    </div>
-    <div class="col-md-3">
-        <input name="date" type="date" class="form-control" value="@ViewBag.Date" />
-    </div>
-    <div class="col-md-2 d-grid">
-        <button class="btn btn-raceday">Filter</button>
+<form method="get" class="filter-bar">
+    <div class="row g-2">
+        <div class="col-md-4">
+            <input name="city" class="form-control" placeholder="City" value="@ViewBag.City" />
+        </div>
+        <div class="col-md-3">
+            <select name="type" class="form-select">
+                <option value="">All types</option>
+                <option value="Run" selected="@(ViewBag.Type == "Run")">Run</option>
+                <option value="Walk" selected="@(ViewBag.Type == "Walk")">Walk</option>
+                <option value="Cycle" selected="@(ViewBag.Type == "Cycle")">Cycle</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input name="date" type="date" class="form-control" value="@ViewBag.Date" />
+        </div>
+        <div class="col-md-2 d-grid">
+            <button class="btn btn-raceday">Filter</button>
+        </div>
     </div>
 </form>
 
@@ -39,16 +51,17 @@ else
     <div class="row g-3">
         @foreach (var e in Model)
         {
-            <div class="col-md-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <span class="badge bg-dark mb-2">@e.EventType</span>
-                        <h5 class="card-title">@e.Title</h5>
-                        <p class="card-text text-muted mb-1">@e.EventDate.ToString("dd MMM yyyy") | @e.City</p>
-                        <p class="card-text">@e.DistanceKm km</p>
+            <div class="col-md-6 col-lg-4">
+                <div class="event-card type-@e.EventType.ToLower()">
+                    <div class="body">
+                        <div class="type-tag">@e.EventType</div>
+                        <h5>@e.Title</h5>
+                        <div class="meta">@e.EventDate.ToString("dd MMM yyyy") | @e.City</div>
+                        <span class="chip">@e.DistanceKm km</span>
                     </div>
-                    <div class="card-footer bg-white border-0">
-                        <a asp-action="EventDetails" asp-route-id="@e.EventId" class="btn btn-raceday w-100">View details</a>
+                    <div class="foot">
+                        <a asp-action="EventDetails" asp-route-id="@e.EventId"
+                           class="btn btn-raceday w-100">View details</a>
                     </div>
                 </div>
             </div>
