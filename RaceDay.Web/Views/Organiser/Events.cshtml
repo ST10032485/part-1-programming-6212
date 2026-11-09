@@ -46,12 +46,7 @@ else
                         <td>@e.EventType</td>
                         <td>@e.DistanceKm km</td>
                         <td>@e.Status</td>
-                        <td>
-                            <form asp-action="DeleteEvent" asp-route-id="@e.EventId" method="post"
-                                  onsubmit="return confirm('Delete this event?');">
-                                <button class="btn btn-sm btn-outline-danger">Delete</button>
-                            </form>
-                        </td>
+                     
 
                         <td class="d-flex gap-1">
                             <a asp-action="EditEvent" asp-route-id="@e.EventId" class="btn btn-sm btn-outline-dark">Edit</a>
