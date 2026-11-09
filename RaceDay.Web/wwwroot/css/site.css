@@ -1,0 +1,77 @@
+:root {
+    --rd-orange: #ff5a1f;
+    --rd-dark: #111827;
+    --rd-light: #f8f9fa;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--rd-light);
+    color: var(--rd-dark);
+}
+
+.raceday-nav {
+    background: var(--rd-dark);
+}
+
+    .raceday-nav .navbar-brand {
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: #fff;
+    }
+
+        .raceday-nav .navbar-brand span {
+            color: var(--rd-orange);
+        }
+
+.btn-raceday,
+.btn-primary {
+    background: var(--rd-orange);
+    border-color: var(--rd-orange);
+    color: #fff;
+    font-weight: 600;
+}
+
+    .btn-raceday:hover,
+    .btn-primary:hover {
+        background: #e14a12;
+        border-color: #e14a12;
+        color: #fff;
+    }
+
+.hero {
+    background: linear-gradient(135deg, var(--rd-dark), #374151);
+    color: #fff;
+    border-radius: 12px;
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+    .hero h1 {
+        font-weight: 700;
+    }
+
+        .hero h1 span {
+            color: var(--rd-orange);
+        }
+
+.badge-confirmed {
+    background: #198754;
+}
+
+.badge-pending {
+    background: #ffc107;
+    color: #000;
+}
+
+.badge-cancelled {
+    background: #dc3545;
+}
+
+.raceday-footer {
+    background: var(--rd-dark);
+    color: #ccc;
+    text-align: center;
+    padding: 1rem 0;
+    margin-top: 3rem;
+}

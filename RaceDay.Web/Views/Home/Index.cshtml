@@ -1,0 +1,15 @@
+﻿@{
+    ViewData["Title"] = "Home";
+    var loggedIn = !string.IsNullOrEmpty(Context.Session.GetString("Token"));
+}
+
+<div class="hero">
+    <h1>Welcome to RACE<span>DAY</span></h1>
+    <p class="lead">Find your next run, walk or cycle event and enrol in minutes.</p>
+
+    @if (!loggedIn)
+    {
+        <a class="btn btn-raceday btn-lg me-2" asp-controller="Account" asp-action="Register">Get Started</a>
+        <a class="btn btn-outline-light btn-lg" asp-controller="Account" asp-action="Login">Login</a>
+    }
+</div>
