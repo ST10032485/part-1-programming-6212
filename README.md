@@ -1,59 +1,59 @@
-# RaceDay Database
+# RaceDay
 
-This repository contains the SQL script to create and populate the **RaceDay** database. The database is designed to manage running events, organisers, categories, participants, enrolments, and results.
+![CI](https://github.com/ST10032485/part-1-programming-6212/actions/workflows/validate_doc.yml/badge.svg)
 
-## Overview
+RaceDay is a .NET 9 web application for managing race events and enrolments. It has an ASP.NET Core API (`RaceDay.Api`), an MVC web front end (`RaceDay.Web`) and a test project (`RaceDay.Tests`).
 
-The RaceDay database supports:
+## Project structure
 
-- **Organisers** – individuals or organisations hosting events.
-- **Categories** – event types with a defined distance (e.g., 5KM, 10KM, Half Marathon).
-- **Events** – specific races scheduled on a date and location.
-- **Participants** – runners who register for events.
-- **Enrolments** – registrations linking participants to events, including payment and status tracking.
-- **Results** – official finish times, positions, and status per enrolment.
+| Folder | Purpose |
+|---|---|
+| `RaceDay.Api` | REST API (events, enrolments, authentication) |
+| `RaceDay.Web` | MVC web front end |
+| `RaceDay.Tests` | Automated tests |
+| `docs` | Project documentation |
 
-The schema enforces data integrity via primary/foreign keys, check constraints, and unique constraints.
+## Prerequisites
 
-## Database Schema
+- [.NET 9 SDK](https://dotnet.microsoft.com/download)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (for the container)
+- Visual Studio 2022 or later (optional)
 
-### Table Structure
+## Run locally
 
-| Table         | Description |
-|---------------|-------------|
-| `Organiser`   | Stores organiser details (name, email, phone, organisation). |
-| `Category`    | Defines race categories with distance (km) and description. |
-| `Event`       | Holds event information, linked to an organiser and a category. |
-| `Participant` | Participant profile with personal details and credentials. |
-| `Enrolment`   | Registration record linking a participant to an event, with status and payment flags. |
-| `Result`      | Results per enrolment (finish time, position, status). |
+1. Start the API:
+   ```
+   cd RaceDay.Api
+   dotnet run --urls http://0.0.0.0:5114
+   ```
+   Swagger is available at http://localhost:5114/swagger
+2. In a second terminal, start the web app:
+   ```
+   cd RaceDay.Web
+   dotnet run
+   ```
 
-### Relationships
+## Run with Docker
 
-- Each **Event** belongs to one **Organiser** and one **Category**.
-- Each **Enrolment** is for one **Participant** and one **Event** (unique pair).
-- Each **Result** corresponds to exactly one **Enrolment** (one-to-one).
+The web app runs in a container. Start the API first (see above), then from the repository root run:
 
-### Key Constraints
+```
+docker build -t raceday-web ./RaceDay.Web
+docker run -p 8080:8080 -e ApiBaseUrl=http://host.docker.internal:5114/ raceday-web
+```
 
-- `Event.Status`: `'Upcoming'`, `'Open'`, `'Closed'`, `'Completed'`, `'Cancelled'`
-- `Enrolment.Status`: `'Active'`, `'Cancelled'`, `'Completed'`
-- `Enrolment.PaymentStatus`: `'Pending'`, `'Paid'`, `'Refunded'`
-- `Result.ResultStatus`: `'Pending'`, `'Finished'`, `'DNF'`, `'DNS'`
+Open http://localhost:8080/Account/Login
 
-## Setup Instructions
+## Run the tests
 
-### Prerequisites
+```
+dotnet test RaceDay.sln
+```
 
-- Microsoft SQL Server (2012 or later) or Azure SQL Database.
-- SQL Server Management Studio (SSMS) or Azure Data Studio.
-- Permissions to create tables and insert data.
+## Continuous integration
 
-### Steps
+GitHub Actions (`.github/workflows/validate_doc.yml`) runs on every push and pull request to `main`. It restores, builds the whole solution, runs the tests and builds the Docker image.
 
-1. **Create a database** (if not already exists).  
-   You can run:
-   ```sql
-   CREATE DATABASE RaceDay;
-   GO
-   USE RaceDay;
+## Cloud storage
+
+Azure Blob Storage setup: *(to be added)*
